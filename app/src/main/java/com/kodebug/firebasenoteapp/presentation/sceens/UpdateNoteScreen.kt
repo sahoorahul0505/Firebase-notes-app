@@ -1,4 +1,4 @@
-package com.kodebug.firebasenoteapp.sceens
+package com.kodebug.firebasenoteapp.presentation.sceens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -31,17 +31,23 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kodebug.firebasenoteapp.R
-import com.kodebug.firebasenoteapp.model.Note
+import com.kodebug.firebasenoteapp.data.model.Note
+import com.kodebug.firebasenoteapp.presentation.viewModel.NoteViewModel
 import com.kodebug.firebasenoteapp.ui.theme.colorBlack
 import com.kodebug.firebasenoteapp.ui.theme.colorGray
 import com.kodebug.firebasenoteapp.ui.theme.colorLightGray
 import com.kodebug.firebasenoteapp.ui.theme.colorRed
 
 @Composable
-fun UpdateNoteScreen(navController: NavHostController, noteId: String?) {
+fun UpdateNoteScreen(
+    navController: NavHostController,
+    noteId: String?,
+    viewModel: NoteViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val firebaseDB = FirebaseFirestore.getInstance()
     val collectionReference = firebaseDB.collection("notes")
@@ -51,7 +57,7 @@ fun UpdateNoteScreen(navController: NavHostController, noteId: String?) {
 
 
     LaunchedEffect(Unit) {
-        if (noteId != null){
+        if (noteId != null) {
             collectionReference.document(noteId.toString()).get().addOnSuccessListener {
                 val singleData = it.toObject(Note::class.java) // convert collect data to object
                 title.value = singleData?.title.toString()
@@ -67,30 +73,45 @@ fun UpdateNoteScreen(navController: NavHostController, noteId: String?) {
                     if (title.value.isEmpty()) {
                         Toast.makeText(context, "Please enter title and description", Toast.LENGTH_SHORT).show()
                     } else {
+                        // with mvvm
                         val oldNoteId = noteId.toString()
-                        val updateNoteData = Note(
-                            id = oldNoteId,
+                        viewModel.updateNote(
+                            oldNoteId = oldNoteId,
                             title = title.value,
                             description = description.value
                         )
+                        Toast.makeText(
+                            context, "Note updated successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navController.popBackStack()
 
-                        collectionReference.document(oldNoteId).set(updateNoteData).addOnCompleteListener {
-                            if (it.isSuccessful) {
-                                Toast.makeText(
-                                    context, "Note added successfully",
-                                    Toast.LENGTH_SHORT
-                                ).show()
 
-                                navController.popBackStack()
-
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Something went wrong\nPlease check your internet connection",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
+                        // without mvvm
+//                        val oldNoteId = noteId.toString()
+//                        val updateNoteData = Note(
+//                            id = oldNoteId,
+//                            title = title.value,
+//                            description = description.value
+//                        )
+//
+//                        collectionReference.document(oldNoteId).set(updateNoteData).addOnCompleteListener {
+//                            if (it.isSuccessful) {
+//                                Toast.makeText(
+//                                    context, "Note added successfully",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//
+//                                navController.popBackStack()
+//
+//                            } else {
+//                                Toast.makeText(
+//                                    context,
+//                                    "Something went wrong\nPlease check your internet connection",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//                            }
+//                        }
                     }
                 },
                 shape = CircleShape,
@@ -100,7 +121,7 @@ fun UpdateNoteScreen(navController: NavHostController, noteId: String?) {
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_tick),
-                    contentDescription = "add note"
+                    contentDescription = "update note"
                 )
             }
         }
@@ -116,7 +137,7 @@ fun UpdateNoteScreen(navController: NavHostController, noteId: String?) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Add note",
+                    text = "Update note",
                     style = TextStyle(
                         fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                         fontWeight = FontWeight.Bold,

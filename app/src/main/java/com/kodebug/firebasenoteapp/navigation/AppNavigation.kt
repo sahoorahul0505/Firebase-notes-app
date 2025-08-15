@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.kodebug.firebasenoteapp.sceens.AddNoteScreen
-import com.kodebug.firebasenoteapp.sceens.NoteScreen
-import com.kodebug.firebasenoteapp.sceens.SplashScreen
-import com.kodebug.firebasenoteapp.sceens.UpdateNoteScreen
+import com.kodebug.firebasenoteapp.presentation.sceens.AddNoteScreen
+import com.kodebug.firebasenoteapp.presentation.sceens.NoteScreen
+import com.kodebug.firebasenoteapp.presentation.sceens.SplashScreen
+import com.kodebug.firebasenoteapp.presentation.sceens.UpdateNoteScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {

@@ -1,4 +1,4 @@
-package com.kodebug.firebasenoteapp.model
+package com.kodebug.firebasenoteapp.data.model
 
 data class Note(
     val id: String = "",

@@ -1,4 +1,4 @@
-package com.kodebug.firebasenoteapp.sceens
+package com.kodebug.firebasenoteapp.presentation.sceens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -30,17 +30,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kodebug.firebasenoteapp.R
-import com.kodebug.firebasenoteapp.model.Note
+import com.kodebug.firebasenoteapp.data.model.Note
+import com.kodebug.firebasenoteapp.presentation.viewModel.NoteViewModel
 import com.kodebug.firebasenoteapp.ui.theme.colorBlack
 import com.kodebug.firebasenoteapp.ui.theme.colorGray
 import com.kodebug.firebasenoteapp.ui.theme.colorLightGray
 import com.kodebug.firebasenoteapp.ui.theme.colorRed
 
 @Composable
-fun AddNoteScreen(navController: NavHostController) {
+fun AddNoteScreen(navController: NavHostController, viewModel: NoteViewModel = hiltViewModel()) {
 
     val context = LocalContext.current
     val firebaseDB = FirebaseFirestore.getInstance()
@@ -54,33 +56,43 @@ fun AddNoteScreen(navController: NavHostController) {
             FloatingActionButton(
                 onClick = {
                     if (title.value.isEmpty()) {
-                        Toast.makeText(context, "Please enter title and description", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Please enter title", Toast.LENGTH_SHORT).show()
                     } else {
-                        val newNoteId =
-                            collectionReference.document().id // this will create a automatic id code in firestore
-                        val newNoteData = Note(
-                            id = newNoteId,
-                            title = title.value,
-                            description = description.value
-                        )
+                        // with Mvvm
+                        viewModel.addNote(title.value, description.value)
+                        Toast.makeText(
+                            context, "Note added successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navController.popBackStack()
 
-                        collectionReference.document(newNoteId).set(newNoteData).addOnCompleteListener {
-                            if (it.isSuccessful) {
-                                Toast.makeText(
-                                    context, "Note added successfully",
-                                    Toast.LENGTH_SHORT
-                                ).show()
 
-                                navController.popBackStack()
-
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Something went wrong\nPlease check your internet connection",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
+                        // without Mvvm
+//                        val newNoteId =
+//                            collectionReference.document().id // this will create a automatic id code in firestore
+//                        val newNoteData = Note(
+//                            id = newNoteId,
+//                            title = title.value,
+//                            description = description.value
+//                        )
+//
+//                        collectionReference.document(newNoteId).set(newNoteData).addOnCompleteListener {
+//                            if (it.isSuccessful) {
+//                                Toast.makeText(
+//                                    context, "Note added successfully",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//
+//                                navController.popBackStack()
+//
+//                            } else {
+//                                Toast.makeText(
+//                                    context,
+//                                    "Something went wrong\nPlease check your internet connection",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//                            }
+//                        }
                     }
                 },
                 shape = CircleShape,

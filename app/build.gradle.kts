@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -59,4 +62,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.accompanist.systemuicontroller)
+
+    implementation (libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
 }
